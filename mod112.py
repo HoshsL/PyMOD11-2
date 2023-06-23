@@ -9,7 +9,8 @@ problem_and_code = {'000':'不存在问题',
                     '004':'参数id长度错误',
                     '005':'参数id内容包含非法字符错误',
                     '006':'参数id不合法',
-                    '007':'参数id中包含不存在的地区'
+                    '007':'参数id中包含不存在的地区',
+                    '008':'参数id中包含不存在的时间'
                     }
 
 def code_to_location(code: list|tuple) -> list:
@@ -137,37 +138,36 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
         return analyse('007')
     
     # 校验3
-    '''
     if time_check:  # 对出生日期合法性的检查
-        if int(list1[6]+list1[7]+list1[8]+list1[9]) <= int(time.strftime("%Y", time.localtime())):
-            if int(list1[10]+list1[11]) <= 12 and 1 <= int(list1[10]+list1[11]):
-                if list1[10]+list1[11] in ["01","03","05","07","08","10","12"]:
-                    if int(list1[12]+list1[13]) <= 31 and 1 <= int(list1[12]+list1[13]):
-                        return True
+        if int(birth_date[0]) <= int(time.strftime("%Y", time.localtime())):  # 年
+            if int(birth_date[1]) <= 12 and 1 <= int(birth_date[1]):  # 月
+                if birth_date[1] in ["01","03","05","07","08","10","12"]:  # 大月
+                    if int(birth_date[2]) <= 31 and 1 <= int(birth_date[2]):
+                        pass
                     else:
-                        return False
-                elif list1[10]+list1[11] in ["04","06","09","11"]:
-                    if int(list1[12]+list1[13]) <= 30 and 1 <= int(list1[12]+list1[13]):
-                        return True
+                        return analyse('008')
+                elif birth_date[1] in ["04","06","09","11"]:  # 小月
+                    if int(birth_date[2]) <= 30 and 1 <= int(birth_date[2]):
+                        pass
                     else:
-                        return False
+                        return analyse('008')
                 else:
-                    if int(list1[6]+list1[7]+list1[8]+list1[9]) % 4 == 0:
-                        if int(list1[12]+list1[13]) <= 29 and 1 <= int(list1[12]+list1[13]):
-                            return True
+                    if int(birth_date[0]) % 4 == 0:  # 闰月
+                        if int(birth_date[2]) <= 29 and 1 <= int(birth_date[2]):
+                            pass
                         else:
-                            return False
-                    else:
-                        if int(list1[12]+list1[13]) <= 28 and 1 <= int(list1[12]+list1[13]):
-                            return True
+                            return analyse('008')
+                    else:  # 平月
+                        if int(birth_date[2]) <= 28 and 1 <= int(birth_date[2]):
+                            pass
                         else:
-                            return False
+                            return analyse('008')
             else:
-                return False
+                return analyse('008')
         else:
-            return False
+            return analyse('008')
     else:
-        pass'''
+        pass
 
     # 返回值
     return analyse('000')
@@ -181,4 +181,8 @@ def problem(code: str) -> str:
 
 
 if __name__ == '__main__':
-    ...
+    # 效果演示(实例来自于GB11643-1999)
+    # 北京市朝阳区1949年12月31日出生的一女性公民
+    print(mod112('11010519491231002X', details=True))
+    # 广东省汕头市朝阳县1880年1月1日出生的一男性公民
+    print(mod112('440524188001010014', details=True))
