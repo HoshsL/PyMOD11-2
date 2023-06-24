@@ -6,6 +6,7 @@ v 0.1.0
 
 from .mod112 import *
 
+__name__ = 'pymod112'
 __title__ = 'pymod112'
 __version__ = '0.1.0'
 __author__ = 'HoshsL'

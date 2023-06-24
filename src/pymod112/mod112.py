@@ -3,11 +3,11 @@ import time
 import os
 
 problem_and_code = {'000':'不存在问题',
-                    '001':'参数id类型错误',
-                    '002':'参数time_check类型错误',
-                    '003':'参数details类型错误',
+                    '001':'<未定义>',
+                    '002':'<未定义>',
+                    '003':'<未定义>',
                     '004':'参数id长度错误',
-                    '005':'参数id内容包含非法字符错误',
+                    '005':'参数id内容包含非法字符',
                     '006':'参数id不合法',
                     '007':'参数id中包含不存在的地区',
                     '008':'参数id中包含不存在的时间'
@@ -28,7 +28,8 @@ def code_to_location(code: list|tuple) -> list:
     '''
 
     # 参数检查
-    ...
+    if not isinstance(code, (list, tuple)):
+        raise TypeError('"code" should be a list or tuple')
 
     # 查询
     workplace = os.getcwd()
@@ -69,11 +70,12 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
     # 结束函数
     def analyse(code:str='000') -> bool|dict:
         # 参数检查
-        ...
+        if not isinstance(code, str):
+            raise TypeError('"code" should be a str')
 
         # 输出处理
         if details:
-            result = {'id':'',  
+            result = {'id':id,  
                       'province':['', ''], 
                       'city':['', ''], 
                       'county':['', ''],
@@ -83,19 +85,11 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
                       'problem':code}
             if code == '000':
                 result['result'] = True
-            if code == '001':
-                pass
-            else:
                 result['id'] = id
-            if code == '004':
-                pass
-            else:
+            if not (code in ('004', '005')):
                 result['birth_date'] = birth_date
                 result['gender'] = gender
-            if len(location) == 0:
-                pass
-            else:
-                result.update(location)
+            result.update(location)
             return result
         else:
             if code == '000':
@@ -103,11 +97,18 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
             else:
                 return False
 
-    # 参数类型检查
-    ...
-
     # 变量设置
-    location = {}
+    location = {'province':['', ''], 'city':['', ''], 'county':['', '']}
+
+    # 参数类型检查
+    if not isinstance(id, str):
+        raise TypeError('"id" should be a str')
+    if not isinstance(time_check, bool):
+        raise TypeError('"time_check" should be a bool')
+    if not isinstance(details, bool):
+        raise TypeError('"details" should be a bool')
+    if not id[:17].isnumeric():
+        return analyse('005')
 
     # 参数预处理
     if len(id) == 18:
@@ -132,7 +133,9 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
         return analyse('006')
 
     # 校验2
-    location = {'province':[address[0], ''], 'city':[address[1], ''], 'county':[address[2], '']}
+    location['province'][0] = address[0]
+    location['city'][0] = address[1]
+    location['county'][0] = address[2]
     location['province'][1], location['city'][1], location['county'][1] = code_to_location([address[0], address[1], address[2]])
     if location['province'][1] == '':
         return analyse('007')
