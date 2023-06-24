@@ -1,3 +1,17 @@
+Metadata-Version: 2.1
+Name: pymod112
+Version: 0.1.0
+Summary: 一个可以离线检验公民身份号码是否合法的程序
+Author-email: HoshsL <HoshsL@outlook.com>
+Project-URL: Homepage, https://gitee.com/HoshsL/PyMOD11-2
+Project-URL: Bug Tracker, https://gitee.com/HoshsL/PyMOD11-2/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # pymod112
 
 一个基于Python开发的公民身份号码检验与地区代码查找程序

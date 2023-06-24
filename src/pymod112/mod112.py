@@ -32,7 +32,7 @@ def code_to_location(code: list|tuple) -> list:
 
     # 查询
     workplace = os.getcwd()
-    os.chdir(os.path.realpath('.'))
+    os.chdir(os.path.dirname(__file__))
     with open('./RegionCode', 'rb') as f:
         region_code: dict = pickle.load(f)  # 例{code:name}
     result = [region_code.get(f'{code[0]}0000', ''), 
