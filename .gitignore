@@ -1,1 +1,7 @@
-tests/*
+/tests/*
+/.vscode
+/.pytest_cache
+/dist
+/src/pymod112.egg-info
+/src/pymod112/__pycache__
+/pyproject.toml

@@ -2,16 +2,16 @@ import pickle
 import time
 import os
 
-problem_and_code = {'000':'不存在问题',
-                    '001':'<未定义>',
-                    '002':'<未定义>',
-                    '003':'<未定义>',
-                    '004':'参数id长度错误',
-                    '005':'参数id内容包含非法字符',
-                    '006':'参数id不合法',
-                    '007':'参数id中包含不存在的地区',
-                    '008':'参数id中包含不存在的时间'
-                    }
+code_to_error = {'000':'不存在问题',
+                   '001':'<未定义>',
+                   '002':'<未定义>',
+                   '003':'<未定义>',
+                   '004':'参数id长度错误',
+                   '005':'参数id内容包含非法字符',
+                   '006':'参数id不合法',
+                   '007':'参数id中包含不存在的地区',
+                   '008':'参数id中包含不存在的时间'
+                   }
 
 def code_to_location(code: list|tuple) -> list:
     '''
@@ -41,7 +41,7 @@ def code_to_location(code: list|tuple) -> list:
               region_code.get(f'{code[0]}{code[1]}{code[2]}', '')]
     os.chdir(workplace)
     return result
-            
+     
 def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
     """
     检验传入的ID是否是符合规范的中华人民共和国公民身份号码。\n
@@ -63,8 +63,7 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
              'problem':<问题代码:str>}\n
     注0：不存在的会用空字符串代替\n
     注1：'gender'中1指代男性 0指代女性\n
-    注2：获取问题详情请使用problem(code=<问题代码:str>)\n
-    注3：问题代码为'000'时表示不存在问题\n
+    注2：问题代码为'000'时表示不存在问题\n
     """
 
     # 结束函数
@@ -174,13 +173,6 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
 
     # 返回值
     return analyse('000')
-
-def problem(code: str) -> str:
-    '''
-    用问题代码查找对应的问题详情
-    '''
-
-    return problem_and_code[code]
 
 
 if __name__ == '__main__':
