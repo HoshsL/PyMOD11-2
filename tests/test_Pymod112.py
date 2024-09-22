@@ -4,7 +4,7 @@ from src import pymod112
 class TestPymod112(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.id = '11010519491231002X'
+        self.id1 = '11010519491231002X'
         self.detail = {'id': '11010519491231002X', 
                        'province': ['11', '北京市'], 
                        'city': ['01', ''], 
@@ -17,8 +17,8 @@ class TestPymod112(unittest.TestCase):
         self.code = '110105'
 
     def test_mod112(self):
-        self.assertTrue(pymod112.mod112(self.id))
-        self.assertEqual(pymod112.mod112(self.id, details=True), self.detail)
+        self.assertTrue(pymod112.mod112(self.id1))
+        self.assertEqual(pymod112.mod112(self.detail['id'], details=True, location_check=True), self.detail)
 
     def test_location2code(self):
         self.assertEqual(pymod112.location2code(self.location), self.code)

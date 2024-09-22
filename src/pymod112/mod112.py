@@ -3,7 +3,7 @@ import time
 import os
 
 CODE2ERROR = {'000':'不存在问题',
-              # '001':'',
+              '001':'缺失关键文件',
               '002':'参数location长度错误',
               '003':'参数code长度错误',
               '004':'参数id长度错误',
@@ -12,11 +12,11 @@ CODE2ERROR = {'000':'不存在问题',
               '007':'参数id中包含不存在的地区',
               '008':'参数id中包含不存在的时间'}
 
-def code2location(code: str) -> list[str]:
+def code2location(code: str) -> list[str]|str:
     '''
     通过中华人民共和国县以上行政区划代码获取对应单位名称(地方名称)\n
     数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
-    注：暂无三沙市西沙区和三沙市南沙区代码)\n
+    （注：暂无三沙市西沙区和三沙市南沙区代码）\n
     \n
     参数\n
     code: str -> 长度为6的行政区划代码\n
@@ -24,6 +24,7 @@ def code2location(code: str) -> list[str]:
     list -> [<省>, <市>, <县>]\n
     注1：存在不存在的省、市或县的返回的对应值为空字符串\n
     注2：部分地区（如直辖市）返回值中市对应的值为空字符串\n
+    注3：如果关键文件缺失会返回字符串'001'\n
     '''
 
     # 参数检查
@@ -35,11 +36,16 @@ def code2location(code: str) -> list[str]:
     # 查询
     workplace = os.getcwd()
     os.chdir(os.path.dirname(__file__))
-    with open('./RegionCode', 'rb') as f:
-        region_code: dict = pickle.load(f)  # 例{code:name}
-    result = [region_code.get(f'{code[:2]}0000', ''), 
-              region_code.get(f'{code[:2]}{code[2:4]}00', ''), 
-              region_code.get(f'{code[:2]}{code[2:4]}{code[4:6]}', '')]
+    try:
+        with open('./RegionCode', 'rb') as f:
+            region_code: dict = pickle.load(f)  # 例{code:name}
+        result = [region_code.get(f'{code[:2]}0000', ''), 
+                    region_code.get(f'{code[:2]}{code[2:4]}00', ''), 
+                    region_code.get(f'{code[:2]}{code[2:4]}{code[4:6]}', '')]
+    except FileNotFoundError:
+        return '001'
+    except:
+        pass
     os.chdir(workplace)
     return result
 
@@ -47,7 +53,7 @@ def location2code(location: list|tuple) -> str:
     '''
     通过单位名称(地方名称)获取对应中华人民共和国县以上行政区划代码\n
     数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
-    注：暂无三沙市西沙区和三沙市南沙区代码)\n
+    （注：暂无三沙市西沙区和三沙市南沙区代码)\n
     \n
     参数\n
     location: list|tuple -> 将单位名称(地方名称)按省、市、县顺序排列\n
@@ -56,6 +62,8 @@ def location2code(location: list|tuple) -> str:
     str -> 长度为6的行政区划代码\n
     注1：传入不存在地区则返回值为空字符串\n
     注2：部分地区（如直辖市）传入的列表或元组元素个数为2\n
+    注3：如果关键文件缺失会返回字符串'001'\n
+    注4：如果为直辖市则传入参数只需有两个元素，元素个数异常会返回字符串'002'\n
     '''
 
     # 参数检查
@@ -72,8 +80,12 @@ def location2code(location: list|tuple) -> str:
     # 查询
     workplace = os.getcwd()
     os.chdir(os.path.dirname(__file__))
-    with open('./RegionCode', 'rb') as f:
-        region_code: dict = pickle.load(f)  # 例{code:name}
+    try:
+        with open('./RegionCode', 'rb') as f:
+            region_code: dict = pickle.load(f)  # 例{code:name}
+    except FileNotFoundError:
+        return '001'
+
     result = ''
     try:
         result += list(region_code.keys())[list(region_code.values()).index(location[0])][:2]
@@ -83,14 +95,13 @@ def location2code(location: list|tuple) -> str:
         else:
             result += list(region_code.keys())[list(region_code.values()).index(location[1])][2:4]
             result += list(region_code.keys())[list(region_code.values()).index(location[2])][4:6]
-    except Exception as error:
-        print(str(error))
+    except:
         result =''
 
     os.chdir(workplace)
     return result
 
-def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
+def mod112(id: str, time_check: bool=True, location_check: bool=False, details: bool=False) -> bool|dict:
     '''
     检验传入的ID是否是符合规范的中华人民共和国公民身份号码。\n
     该检验无法接入公安系统故无法检验传入的ID是否真实存在。\n
@@ -98,6 +109,7 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
     参数\n
     id: str -> 传入内容即为需要检验的ID，最后一位自动忽略大小写\n
     time_check：bool -> 传入True则会检验时间是否合法以防止出现不存在的时间，时间基准来自于本地\n
+    location_check：bool ->传入True则会检验地址真实性，默认不检查\n
     details: bool -> 传入True则会输出类型为dict, 传入False则会输出类型为bool\n
     输出\n
     bool -> True即表示id合法，False则表示不合法\n
@@ -134,7 +146,6 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
                       'problem':code}
             if code == '000':
                 result['result'] = True
-                result['id'] = id
             if not (code in ('004', '005')):  # id不合法但长度内容符合要求
                 result['birth_date'] = [str(birth_date[0]), str(birth_date[1]), str(birth_date[2])]
                 result['gender'] = '男' if gender == 1 else '女'
@@ -183,18 +194,26 @@ def mod112(id: str, time_check: bool=True, details: bool=False) -> bool|dict:
         pass
     else:
         return analyse('006')
-
-    # 地址真实性
+    
     location['province'][0] = address[0]
     location['city'][0] = address[1]
     location['county'][0] = address[2]
-    location['province'][1], location['city'][1], location['county'][1] = code2location(id[0:6])
-    if location['province'][1] == '':
-        return analyse('007')
+    # 地址真实性
+    if location_check:
+        if isinstance(code2location(id[0:6]), str):
+            return analyse('001')
+        else:
+            location['province'][1], location['city'][1], location['county'][1] = code2location(id[0:6])
+            if location['province'][1] == '':
+                return analyse('007')
+    else:
+        pass
 
-    # 时间和理性（只检测时间是否存在或在未来）
+    # 时间合理性（只检测时间是否存在或在未来）
     if time_check:
-        if birth_date[0] < int(time.strftime('%Y', time.localtime())):  # 过去年
+        if birth_date[0] < 1900:  # 出生时间早于1900年
+            return analyse('008')
+        elif birth_date[0] < int(time.strftime('%Y', time.localtime())):  # 过去年
             if birth_date[1] <= 12 and 1 <= birth_date[1]:  # 月
                 if birth_date[1] in [1, 3, 5, 7, 8, 10, 12]:  # 大月的日
                     if birth_date[2] <= 31 and 1 <= birth_date[2]:

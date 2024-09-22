@@ -61,6 +61,7 @@ True
 >>> import pymod112
 >>> pymod112.CODE2ERROR
 {'000':'不存在问题',
+ '001':'缺失关键文件',
  '002':'参数location长度错误',
  '003':'参数code长度错误',
  '004':'参数id长度错误',
@@ -75,6 +76,16 @@ MIT License
 
 ## 更新日志
 
+### **0.1.4(2024-9-21)**
+ - 错误修复
+     - 修复了资源缺失的问题
+ - 新增
+     - 新增最早出生时间检查
+     - 新增错误代码'001'
+     - 新增对关键资源的检查
+ - 已知问题
+     - 存在地址检查出错的可能性
+
 ### **0.1.2(2023-8-5)**
  - 错误修复
      - 修复了参数id来自同年的未来时间也可能通过时间校验的问题
@@ -84,7 +95,7 @@ MIT License
  - 改进
      - 修改了一个函数名(code_to_location -> code2location)
      - 修改了一个常量名(code_to_error -> CODE2ERROR)
-     - 函数code2location参数code要求类型由list变为code
+     - 函数code2location参数code要求类型由list变为str
      - 更新了CODE2ERROR
      - 函数mod112返回中'gender'的值变为'男'或'女'
  - 其它
