@@ -1,3 +1,4 @@
+from typing import Dict, List, Tuple
 import pickle
 import time
 import os
@@ -12,7 +13,7 @@ CODE2ERROR = {'000':'不存在问题',
               '007':'参数id中包含不存在的地区',
               '008':'参数id中包含不存在的时间'}
 
-def code2location(code: str) -> list[str]|str:
+def code2location(code: str) -> List[str]|str:
     '''
     通过中华人民共和国县以上行政区划代码获取对应单位名称(地方名称)\n
     数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
@@ -28,7 +29,7 @@ def code2location(code: str) -> list[str]|str:
     '''
 
     # 参数检查
-    if not isinstance(code, str):
+    if not isinstance(code, str): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('"code" should be a string')
     elif len(code) != 6:
         return '003'
@@ -36,9 +37,10 @@ def code2location(code: str) -> list[str]|str:
     # 查询
     workplace = os.getcwd()
     os.chdir(os.path.dirname(__file__))
+    result: List[str] = []
     try:
         with open('./RegionCode', 'rb') as f:
-            region_code: dict = pickle.load(f)  # 例{code:name}
+            region_code: Dict[str, str] = pickle.load(f)  # 例{code:name}
         result = [region_code.get(f'{code[:2]}0000', ''), 
                     region_code.get(f'{code[:2]}{code[2:4]}00', ''), 
                     region_code.get(f'{code[:2]}{code[2:4]}{code[4:6]}', '')]
@@ -49,7 +51,7 @@ def code2location(code: str) -> list[str]|str:
     os.chdir(workplace)
     return result
 
-def location2code(location: list|tuple) -> str:
+def location2code(location: List[str]|Tuple[str, str, str]) -> str:
     '''
     通过单位名称(地方名称)获取对应中华人民共和国县以上行政区划代码\n
     数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
@@ -67,14 +69,14 @@ def location2code(location: list|tuple) -> str:
     '''
 
     # 参数检查
-    if not isinstance(location, (list, tuple)):
+    if not isinstance(location, (list, tuple)): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('"location" should be a list or tuple')
     elif not(len(location) in (2, 3)):
         return '002'
-    elif not(isinstance(location[0], str) and isinstance(location[1], str)):
+    elif not(isinstance(location[0], str) and isinstance(location[1], str)): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('The element type in "location" must be a string')
     elif len(location) == 3:
-        if not(isinstance(location[2], str)):
+        if not(isinstance(location[2], str)): # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError('The element type in "location" must be a string')
 
     # 查询
@@ -82,11 +84,11 @@ def location2code(location: list|tuple) -> str:
     os.chdir(os.path.dirname(__file__))
     try:
         with open('./RegionCode', 'rb') as f:
-            region_code: dict = pickle.load(f)  # 例{code:name}
+            region_code: Dict[str, str] = pickle.load(f)  # 例{code:name}
     except FileNotFoundError:
         return '001'
 
-    result = ''
+    result: str = ''
     try:
         result += list(region_code.keys())[list(region_code.values()).index(location[0])][:2]
         if len(location) == 2:
@@ -101,7 +103,7 @@ def location2code(location: list|tuple) -> str:
     os.chdir(workplace)
     return result
 
-def mod112(id: str, time_check: bool=True, location_check: bool=False, details: bool=False) -> bool|dict:
+def mod112(id: str, time_check: bool=True, location_check: bool=False, details: bool=False) -> bool|Dict[str, int|bool|str|list[str]]:
     '''
     检验传入的ID是否是符合规范的中华人民共和国公民身份号码。\n
     该检验无法接入公安系统故无法检验传入的ID是否真实存在。\n
@@ -125,18 +127,18 @@ def mod112(id: str, time_check: bool=True, location_check: bool=False, details: 
     注2：问题代码为'000'时表示不存在问题\n
     '''
 
-    def analyse(code:str='000') -> bool|dict:
+    def analyse(code:str='000') -> bool|Dict[str, int|bool|str|list[str]]:
         '''
         结束函数
         '''
 
         # 参数检查
-        if not isinstance(code, str):
+        if not isinstance(code, str): # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError('"code" should be a string')
 
         # 输出
         if details:  # 输出详情
-            result = {'id':id,  
+            result: Dict[str, int|bool|str|list[str]] = {'id':id,  
                       'province':['', ''], 
                       'city':['', ''], 
                       'county':['', ''],
@@ -161,11 +163,11 @@ def mod112(id: str, time_check: bool=True, location_check: bool=False, details: 
     location = {'province':['', ''], 'city':['', ''], 'county':['', '']}
 
     # 参数类型检查
-    if not isinstance(id, str):
+    if not isinstance(id, str): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('"id" should be a string')
-    if not isinstance(time_check, bool):
+    if not isinstance(time_check, bool): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('"time_check" should be a bool')
-    if not isinstance(details, bool):
+    if not isinstance(details, bool): # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError('"details" should be a bool')
     if not id[:17].isnumeric():  # 前17位必须是数字
         return analyse('005')
