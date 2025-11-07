@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import pickle
 import time
 import os
@@ -15,12 +15,12 @@ CODE2ERROR = {
     "008": "参数id中包含不存在的时间",
 }
 
+RCLIST = ["24", "20"]
 
-def code2location(code: str, rc_time: str = "24") -> List[str] | str:
+
+def code2location(code: str, rc_time: str = RCLIST[0]) -> List[str] | str:
     """
     通过中华人民共和国县以上行政区划代码获取对应单位名称(地方名称)\n
-    数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
-    （注：暂无三沙市西沙区和三沙市南沙区代码）\n
     \n
     参数\n
     code: str -> 长度为6的行政区划代码\n
@@ -61,16 +61,12 @@ def code2location(code: str, rc_time: str = "24") -> List[str] | str:
     return result
 
 
-def location2code(
-    location: List[str] | Tuple[str, str, str], rc_time: str = "24"
-) -> str:
+def location2code(location: List[str], rc_time: str = RCLIST[0]) -> str:
     """
     通过单位名称(地方名称)获取对应中华人民共和国县以上行政区划代码\n
-    数据来自《2020年12月中华人民共和国县以上行政区划代码》\n
-    （注：暂无三沙市西沙区和三沙市南沙区代码)\n
     \n
     参数\n
-    location: list|tuple -> 将单位名称(地方名称)按省、市、县顺序排列\n
+    location: list -> 将单位名称(地方名称)按省、市、县顺序排列\n
     例：["四川省", "成都市", "青羊区"]\n
     可选参数\n
     rc_time: str -> 指定区划代码年份，默认为最新\n
@@ -140,6 +136,7 @@ def mod112(
     time_check: bool = True,
     location_check: bool = False,
     details: bool = False,
+    rc_time: str = RCLIST[0],
 ) -> bool | Dict[str, int | bool | str | list[str]]:
     """
     检验传入的ID是否是符合规范的中华人民共和国公民身份号码。\n
@@ -247,11 +244,11 @@ def mod112(
     location["county"][0] = address[2]
     # 地址真实性
     if location_check:
-        if isinstance(code2location(id[0:6]), str):
+        if isinstance(code2location(id[0:6], rc_time), str):
             return analyse("001")
         else:
             location["province"][1], location["city"][1], location["county"][1] = (
-                code2location(id[0:6])
+                code2location(id[0:6], rc_time)
             )
             if location["province"][1] == "":
                 return analyse("007")
