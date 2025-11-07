@@ -28,7 +28,7 @@ True
 
 ```python
 >>> import pymod112
->>> pymod112.mod112('11010519491231002X', details=True)
+>>> pymod112.mod112('11010519491231002X', details=True, location_check=True)
 {'id': '11010519491231002X',
  'province': ['11', '北京市'],
  'city': ['01', ''],
