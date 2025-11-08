@@ -3,4 +3,5 @@
 /dist
 /src/pymod112.egg-info
 /src/pymod112/__pycache__
-/pyproject.toml
+/src/pymod112/xlsx
+/htmlcov

@@ -28,7 +28,7 @@ True
 
 ```python
 >>> import pymod112
->>> pymod112.mod112('11010519491231002X', details=True)
+>>> pymod112.mod112('11010519491231002X', details=True, location_check=True)
 {'id': '11010519491231002X',
  'province': ['11', '北京市'],
  'city': ['01', ''],
@@ -71,10 +71,24 @@ True
  '008':'参数id中包含不存在的时间'}
 ```
 
+返回区划码版本
+
+```python
+>>> import pymod112
+>>> pymod112.RCLIST
+["24", "20"]
+```
+
 ## 许可证
 MIT License
 
 ## 更新日志
+### **0.1.5(2025-11-7)**
+ - 错误修复
+    - 更新了区划码，修复了地址检查出错的可能性
+ - 新增
+    - 新增可选参数rc_time，默认最新版，可选版本请查找RCLIST
+    - 新增常量RCLIST，存储区划码版本，最新版本是RCLIST[0]
 
 ### **0.1.4(2024-9-21)**
  - 错误修复
