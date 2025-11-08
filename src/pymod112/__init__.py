@@ -7,7 +7,7 @@ by HoshsL
 
 from .mod112 import *
 
-__name__ = 'pymod112'
-__title__ = 'pymod112'
-__version__ = '0.1.5'
-__author__ = 'HoshsL'
+__name__ = "pymod112"
+__title__ = "pymod112"
+__version__ = "0.1.5"
+__author__ = "HoshsL"
