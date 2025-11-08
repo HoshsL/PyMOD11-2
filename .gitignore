@@ -3,5 +3,5 @@
 /dist
 /src/pymod112.egg-info
 /src/pymod112/__pycache__
-/src/pymod112/PrintRegionCode.py
-/pyproject.toml
+/src/pymod112/xlsx
+/htmlcov
